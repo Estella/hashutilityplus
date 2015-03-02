@@ -329,12 +329,6 @@ while 1:
             continue
 
         # should be possible to simplify the rest again like such
-        if 'version' == command_word:
-               command = cmd_version
-
-        elif 'commands' == command_word:
-               command = cmd_commands
-
         elif 'join' == command_word:
                access  = acs_admin
                command = cmd_join
