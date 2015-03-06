@@ -8,8 +8,8 @@ port = 6697
 main_channel = ["#main_channel"]
 channels = ["#channel1"] # You can leave this empty if you want to only use main_channel.
 channels_different_command_trigger = ["#channel2"] # You can leave this empty if you want.
-admins = {'foo/bar'}
-trusted = {'foo/bar'}
+admins = {'foo/bar'} # Admin host list.
+ignored = ('such/troll') # Ignores the host from using the commands. 
 join_on_invite = True
 ssl_enabled = True # Not recommended to set this to false!!! 
 sasl_login = False
@@ -106,8 +106,10 @@ def cmd_b64encode(message, _):
 
 def cmd_b64decode(message, _):
     try:
-       text = cmd_args[1]
-       sendmsg(message['replyto'], '%s: Decoded b64 text "%s": %s' % (message['nick'], text, base64.b64decode(text)))
+       text = (cmd_args[1])
+       bytes_string = text.encode("utf-8")
+       sendmsg(message['replyto'], '%s: Decoded b64 text "%s": %s' % (message['nick'], text, base64.b64decode(bytes_string)))
+
     
     except Exception as ex:
         sendmsg(message['replyto'], message['nick'] +": An error has occured ; Error message: {}".format(ex))
@@ -155,9 +157,6 @@ def cmd_part(message, args):
 def sendmsg(chan, msg):
     logging.debug("sendmsg to %s (' %s ')" % (chan, msg))
     sendraw("PRIVMSG %s :%s \n" % (chan, msg))
-
-def acs_trusted(message):
-  return (message['host'] in admins)
 
 def join_channel():
   if main_channel_only_mode == False:
@@ -321,6 +320,12 @@ while 1:
         if message['replyto'] in channels_different_command_trigger:
             wanted_char = char2
 
+        # then check if the user's host is on the ignore list or not
+        if message['host'] in ignored:
+         pass
+        else:
+            continue
+
         # separate the char from command
         used_char = cmd_args[0][0:len(wanted_char)]
         command_word = cmd_args[0][len(wanted_char):]
@@ -329,7 +334,7 @@ while 1:
             continue
 
         # should be possible to simplify the rest again like such
-        elif 'join' == command_word:
+        if 'join' == command_word:
                access  = acs_admin
                command = cmd_join
 
