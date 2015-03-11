@@ -8,8 +8,7 @@ port = 6697
 main_channel = ["#main_channel"]
 channels = ["#channel1"] # You can leave this empty if you want to only use main_channel.
 channels_different_command_trigger = ["#channel2"] # You can leave this empty if you want.
-admins = {'foo/bar'} # Admin host list.
-ignored = ('such/troll') # Ignores the host from using the commands. 
+admins = {'foo/bar'} # Admin host list. 
 join_on_invite = True
 ssl_enabled = True # Not recommended to set this to false!!! 
 sasl_login = False
@@ -22,7 +21,7 @@ server_password = ''
 char1 = '@'
 char2 = '@@'
 main_channel_only_mode = False
-logging_level = logging.DEBUG # Sets the logging level (valid options are DEBUG, INFO, WARNING, ERROR and CRITICAL)
+logging_level = logging.INFO # Sets the logging level (valid options are DEBUG, INFO, WARNING, ERROR and CRITICAL)
 
 #---------------------------------------------------------------#
 
@@ -317,12 +316,6 @@ while 1:
         wanted_char = char1
         if message['replyto'] in channels_different_command_trigger:
             wanted_char = char2
-
-        # then check if the user's host is on the ignore list or not
-        if message['host'] in ignored:
-         pass
-        else:
-            continue
 
         # separate the char from command
         used_char = cmd_args[0][0:len(wanted_char)]
