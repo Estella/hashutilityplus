@@ -98,7 +98,7 @@ def cmd_hash(message, _):
 def cmd_b64encode(message, _):
     try:
        text = (cmd_args[1])
-       sendmsg(message['replyto'], '%s: Encoded text "%s" in base 64: %s' % (message['nick'], text, base64.b64encode(text.encode())))
+       sendmsg(message['replyto'], '%s: Encoded text "%s" in base 64: %s' % (message['nick'], text, base64.b64encode(text.encode('utf-8')).decode('utf-8')))
 
     except Exception as ex:
          sendmsg(message['replyto'], message['nick'] +": An error has occured ; Error message: {}".format(ex))
@@ -107,15 +107,13 @@ def cmd_b64encode(message, _):
 def cmd_b64decode(message, _):
     try:
        text = (cmd_args[1])
-       bytes_string = text.encode("utf-8")
-       sendmsg(message['replyto'], '%s: Decoded b64 text "%s": %s' % (message['nick'], text, base64.b64decode(bytes_string)))
+       sendmsg(message['replyto'], '%s: Decoded b64 text "%s": %s' % (message['nick'], text, base64.b64decode(text.encode('utf-8')).decode('utf-8')))
 
-    
     except Exception as ex:
         sendmsg(message['replyto'], message['nick'] +": An error has occured ; Error message: {}".format(ex))
 
 def cmd_algorithms(message, _):
-    sendmsg(message['replyto'], '%s: Available OpenSSL algorithms: %s' % (message['nick'], hashlib.algorithms_available))
+    sendmsg(message['replyto'], '%s: Available OpenSSL algorithms: %s' % (message['nick'], ", ".join(hashlib.algorithms_available)))
     
 
 def cmd_quit(message, _):
