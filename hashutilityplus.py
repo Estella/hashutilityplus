@@ -85,7 +85,7 @@ def sendraw(msg):
 def cmd_hash(message, _):
     try:
        choice = cmd_args[1]
-       text = (cmd_args[2])
+       text = " ".join(cmd_args[2:])
        h = hashlib.new(choice)
        bytes_string = text.encode('utf-8')
        h.update(bytes_string)
@@ -96,7 +96,7 @@ def cmd_hash(message, _):
 
 def cmd_b64encode(message, _):
     try:
-       text = (cmd_args[1])
+       text = " ".join(cmd_args[2:])
        sendmsg(message['replyto'], '%s: Encoded text "%s" in base 64: %s' % (message['nick'], text, base64.b64encode(text.encode('utf-8')).decode('utf-8')))
 
     except Exception as ex:
@@ -105,7 +105,7 @@ def cmd_b64encode(message, _):
 
 def cmd_b64decode(message, _):
     try:
-       text = (cmd_args[1])
+       text = " ".join(cmd_args[2:])
        sendmsg(message['replyto'], '%s: Decoded b64 text "%s": %s' % (message['nick'], text, base64.b64decode(text.encode('utf-8')).decode('utf-8')))
 
     except Exception as ex:
