@@ -5,15 +5,14 @@ import logging
 botnick = "hashutilityplus"
 server = "chat.freenode.net"
 port = 6697
-main_channel = ["#channel"]
-channels = ["#channel2"] # You can leave this empty if you want to only use main_channel.
-channels_different_command_trigger = [""] # You can leave this empty if you want.
-admins = {'foo/bar'}
-trusted = {'foo/bar'}
-join_on_invite = True
+main_channel = ["#main_channel"]
+channels = ["#channel"] # You can leave this empty if you want to only use main_channel.
+channels_different_command_trigger = ["#channel2"] # You can leave this empty if you want.
+admins = {'foo/bar'} # The admin list uses hosts. Example: unaffiliated/ultimatenate.
+join_on_invite = True # The bot will join on-invite if set to True.
 ssl_enabled = True # Not recommended to set this to false!!! 
 sasl_login = False
-enforce_sasl = True # Disconnects & kills the bot if SASL fails if set to True.
+Enforce_SASL = False # Disconnects & kills the bot if SASL fails if set to True.
 nickserv_login = False
 server_require_pass = False # Set this to true if the server requires a password.
 account_username = '' # Used for NickServ/SASL login.
@@ -21,7 +20,7 @@ account_password = '' # Used for NickServ/SASL login.
 server_password = ''
 char1 = '@'
 char2 = '@@'
-main_channel_only_mode = False
+main_channel_only_mode = False # Will only join the main channel if True
 logging_level = logging.INFO # Sets the logging level (valid options are DEBUG, INFO, WARNING, ERROR and CRITICAL)
 
 #---------------------------------------------------------------#
@@ -84,6 +83,17 @@ def sendraw(msg):
 
     ircsock.sendall(bytes(msg, "utf-8"))
 
+def cmd_commands(message, _):
+    logging.debug("Commands list has been called by %s" % (message['nick']))
+    sendmsg(message['replyto'], "%s: See your PM for my commands." % (message['nick']))
+    sendmsg(message['nick'], "My current commands are:")
+    sendmsg(message['nick'], "%shash - Hashes the specified text in a specified algorithm." % (wanted_char))
+    sendmsg(message['nick'], "%scommands - Displays this command listing" % (wanted_char))
+    sendmsg(message['nick'], "%sb64encode - Encodes the specified text in base 64." % (wanted_char))
+    sendmsg(message['nick'], "%sb64decode - Decodes the specified text in base 64." % (wanted_char))
+    sendmsg(message['nick'], "%salgorithms - Lists the available algorithms that were detected from the OpenSSL library used by python (Used for %shash)." % (wanted_char, wanted_char))
+    sendmsg(message['nick'], "Note: The default char is %s, But it may be different per-channel." % (char1))
+
 def cmd_hash(message, _):
     try:
        choice = cmd_args[1]
@@ -126,6 +136,7 @@ def cmd_quit(message, _):
 def cmd_restart(message, _):
     logging.info("The restart command was used by %s" % (message['nick']))
     os.execl(sys.executable, sys.executable, * sys.argv)
+    time.sleep(2)
 
 def acs_normal(message):
   return True
@@ -262,6 +273,9 @@ while 1:
 
     if message['command'] == 'PING':
         ping(' '.join(message['args']))
+
+    elif message['command'] == '904':
+       ID = False
 
     elif message['command'] == '903':
        ID = True
