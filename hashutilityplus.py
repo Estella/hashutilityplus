@@ -5,14 +5,15 @@ import logging
 botnick = "hashutilityplus"
 server = "chat.freenode.net"
 port = 6697
-main_channel = ["#main_channel"]
-channels = ["#channel1"] # You can leave this empty if you want to only use main_channel.
-channels_different_command_trigger = ["#channel2"] # You can leave this empty if you want.
-admins = {'foo/bar'} # Admin host list. 
+main_channel = ["#channel"]
+channels = ["#channel2"] # You can leave this empty if you want to only use main_channel.
+channels_different_command_trigger = [""] # You can leave this empty if you want.
+admins = {'foo/bar'}
+trusted = {'foo/bar'}
 join_on_invite = True
 ssl_enabled = True # Not recommended to set this to false!!! 
 sasl_login = False
-enforce_sasl = False # Disconnects & kills the bot if SASL fails if set to True.
+enforce_sasl = True # Disconnects & kills the bot if SASL fails if set to True.
 nickserv_login = False
 server_require_pass = False # Set this to true if the server requires a password.
 account_username = '' # Used for NickServ/SASL login.
@@ -36,6 +37,7 @@ import time
 import datetime
 import base64
 import hashlib
+import logging
 
 bot_version = "V1.0"
 
@@ -96,7 +98,7 @@ def cmd_hash(message, _):
 
 def cmd_b64encode(message, _):
     try:
-       text = " ".join(cmd_args[2:])
+       text = " ".join(cmd_args[1:])
        sendmsg(message['replyto'], '%s: Encoded text "%s" in base 64: %s' % (message['nick'], text, base64.b64encode(text.encode('utf-8')).decode('utf-8')))
 
     except Exception as ex:
@@ -105,9 +107,9 @@ def cmd_b64encode(message, _):
 
 def cmd_b64decode(message, _):
     try:
-       text = " ".join(cmd_args[2:])
+       text = " ".join(cmd_args[1:])
        sendmsg(message['replyto'], '%s: Decoded b64 text "%s": %s' % (message['nick'], text, base64.b64decode(text.encode('utf-8')).decode('utf-8')))
-
+    
     except Exception as ex:
         sendmsg(message['replyto'], message['nick'] +": An error has occured ; Error message: {}".format(ex))
 
@@ -154,6 +156,9 @@ def cmd_part(message, args):
 def sendmsg(chan, msg):
     logging.debug("sendmsg to %s (' %s ')" % (chan, msg))
     sendraw("PRIVMSG %s :%s \n" % (chan, msg))
+
+def acs_trusted(message):
+  return (message['host'] in admins)
 
 def join_channel():
   if main_channel_only_mode == False:
@@ -325,7 +330,13 @@ while 1:
             continue
 
         # should be possible to simplify the rest again like such
-        if 'join' == command_word:
+        if 'version' == command_word:
+               command = cmd_version
+
+        elif 'commands' == command_word:
+               command = cmd_commands
+
+        elif 'join' == command_word:
                access  = acs_admin
                command = cmd_join
 
